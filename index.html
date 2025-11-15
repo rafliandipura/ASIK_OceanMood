@@ -1,0 +1,1686 @@
+
+{% extends "base.html" %}
+
+{% block title %}OceanMood - Dashboard{% endblock %}
+
+{% block content %}
+<!-- Hero Section with Background Image -->
+<section class="hero-section text-white">
+    <div class="image-background"></div>
+    <div class="video-overlay"></div>
+
+    <div class="container position-relative h-100 d-flex align-items-center">
+        <div class="row w-100">
+            <div class="col-lg-7">
+                <h1 class="display-4 fw-bold mb-4 animate__animated animate__fadeIn">OceanMood</h1>
+                <p class="lead mb-4 animate__animated animate__fadeIn animate__delay-1s">
+                    Inovasi Sistem Analisis 'Suasana Laut' dan Dinamika Populasi Ikan
+                    Berbasis Data Oseanografi dan Kecerdasan Buatan
+                </p>
+                <div class="d-flex gap-3 animate__animated animate__fadeIn animate__delay-2s">
+                    <a href="{{ url_for('index') }}#analysis" class="btn btn-light btn-lg" id="startAnalysis">
+                        <i class="fas fa-chart-line me-2"></i>Mulai Analisis
+                    </a>
+                    <button class="btn btn-outline-light btn-lg" id="learnMore">
+                        <i class="fas fa-info-circle me-2"></i>Pelajari Lebih Lanjut
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- About OceanMood Section -->
+<section id="tentang" class="about-oceanmood-section mb-5">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card shadow border-0">
+                    <div class="card-body p-4">
+                        <h2 class="text-center mb-4 text-primary">Tentang OceanMood</h2>
+                        <div class="row">
+                            <div class="col-12">
+                                <p class="lead text-center">OceanMood adalah sistem inovatif berbasis AI dan Business Intelligence yang dirancang untuk menganalisis "suasana laut" berdasarkan data oseanografi — seperti Suhu Permukaan Laut (SPL) dan Klorofil-a — guna memahami pola perubahan populasi ikan di suatu wilayah perairan.</p>
+                                <p class="text-center">Dengan membaca "mood laut", sistem ini membantu mengidentifikasi hubungan antara kondisi lingkungan laut dan dinamika populasi biota ikan secara spasial dan temporal.</p>
+                                <div class="mt-4">
+                                    <h5 class="mb-3 text-center">Fitur Utama OceanMood:</h5>
+                                    <div class="row g-2">
+                                        <div class="col-md-6 col-lg-3">
+                                            <div class="card h-100 border-0 shadow-sm feature-card">
+                                                <div class="card-body text-center p-3">
+                                                    <div class="feature-icon mb-3">
+                                                        <i class="fas fa-water fa-2x text-primary"></i>
+                                                    </div>
+                                                    <h6 class="card-title">Analisis Data Real-time</h6>
+                                                    <p class="card-text small text-muted">Pemantauan data oseanografi langsung untuk mendapatkan insight terkini</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-lg-3">
+                                            <div class="card h-100 border-0 shadow-sm feature-card">
+                                                <div class="card-body text-center p-3">
+                                                    <div class="feature-icon mb-3">
+                                                        <i class="fas fa-fish fa-2x text-success"></i>
+                                                    </div>
+                                                    <h6 class="card-title">Prediksi Migrasi Ikan</h6>
+                                                    <p class="card-text small text-muted">Model prediksi untuk mengidentifikasi pola pergerakan populasi ikan</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-lg-3">
+                                            <div class="card h-100 border-0 shadow-sm feature-card">
+                                                <div class="card-body text-center p-3">
+                                                    <div class="feature-icon mb-3">
+                                                        <i class="fas fa-chart-area fa-2x text-info"></i>
+                                                    </div>
+                                                    <h6 class="card-title">Visualisasi Mood Laut</h6>
+                                                    <p class="card-text small text-muted">Tampilan interaktif untuk memahami kondisi dan suasana laut</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-lg-3">
+                                            <div class="card h-100 border-0 shadow-sm feature-card">
+                                                <div class="card-body text-center p-3">
+                                                    <div class="feature-icon mb-3">
+                                                        <i class="fas fa-map-marked-alt fa-2x text-warning"></i>
+                                                    </div>
+                                                    <h6 class="card-title">Lokasi Penangkapan</h6>
+                                                    <p class="card-text small text-muted">Rekomendasi area optimal untuk aktivitas penangkapan ikan</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="analysis" class="filter-section mb-4">
+    <div class="container">
+        {% include 'components/filter_controls.html' %}
+    </div>
+</section>
+
+<!-- Peta Sebaran Klorofil-a dan SPL Section -->
+<section class="maps-section mb-5" id="maps-section">
+    <div class="container">
+        <div class="row">
+            <!-- Peta Sebaran Klorofil-a -->
+            <div class="col-lg-6 mb-4">
+                <div class="card shadow h-100">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-map-marked-alt me-2"></i>Peta Sebaran Klorofil-a</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div id="mapChloro" style="height: 500px;"></div>
+                    </div>
+                    <div class="card-footer bg-light">
+                        <h6 class="mb-3">Legenda Klorofil-a:</h6>
+                        <div class="row text-center">
+                            <div class="col-3">
+                                <div class="d-flex flex-column align-items-center">
+                                    <div style="width: 20px; height: 20px; background-color: #1a9850; border-radius: 50%; margin-bottom: 5px;"></div>
+                                    <span class="badge bg-success">Sangat Rendah</span>
+                                    <small class="text-muted">Gridcode: 1</small>
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="d-flex flex-column align-items-center">
+                                    <div style="width: 20px; height: 20px; background-color: #91cf60; border-radius: 50%; margin-bottom: 5px;"></div>
+                                    <span class="badge bg-success">Rendah</span>
+                                    <small class="text-muted">Gridcode: 2</small>
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="d-flex flex-column align-items-center">
+                                    <div style="width: 20px; height: 20px; background-color: #fee08b; border-radius: 50%; margin-bottom: 5px;"></div>
+                                    <span class="badge bg-warning">Sedang</span>
+                                    <small class="text-muted">Gridcode: 3</small>
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="d-flex flex-column align-items-center">
+                                    <div style="width: 20px; height: 20px; background-color: #fc8d59; border-radius: 50%; margin-bottom: 5px;"></div>
+                                    <span class="badge bg-warning">Tinggi</span>
+                                    <small class="text-muted">Gridcode: 4</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="alert alert-info mt-3" role="alert">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Informasi:</strong> Dataset ini menunjukkan konsentrasi klorofil-a di perairan Indonesia. Klorofil-a adalah pigmen fotosintetik utama yang ditemukan dalam fitoplankton dan digunakan sebagai indikator produktivitas primer di laut.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Peta Sebaran SPL -->
+            <div class="col-lg-6 mb-4">
+                <div class="card shadow h-100">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0"><i class="fas fa-water me-2"></i>Peta Sebaran SPL (Suhu Permukaan Laut)</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div id="mapSST" style="height: 500px;"></div>
+                    </div>
+                    <div class="card-footer bg-light">
+                        <h6 class="mb-3">Legenda SPL:</h6>
+                        <div class="row text-center">
+                            <div class="col-3">
+                                <div class="d-flex flex-column align-items-center">
+                                    <div style="width: 20px; height: 20px; background-color: #2c7bb6; border-radius: 50%; margin-bottom: 5px;"></div>
+                                    <span class="badge bg-info">Sangat Dingin</span>
+                                    <small class="text-muted">&lt; 25°C</small>
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="d-flex flex-column align-items-center">
+                                    <div style="width: 20px; height: 20px; background-color: #00a6ca; border-radius: 50%; margin-bottom: 5px;"></div>
+                                    <span class="badge bg-info">Dingin</span>
+                                    <small class="text-muted">25-27°C</small>
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="d-flex flex-column align-items-center">
+                                    <div style="width: 20px; height: 20px; background-color: #fdae61; border-radius: 50%; margin-bottom: 5px;"></div>
+                                    <span class="badge bg-warning">Normal</span>
+                                    <small class="text-muted">27-29°C</small>
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="d-flex flex-column align-items-center">
+                                    <div style="width: 20px; height: 20px; background-color: #f46d43; border-radius: 50%; margin-bottom: 5px;"></div>
+                                    <span class="badge bg-danger">Panas</span>
+                                    <small class="text-muted">&gt; 29°C</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="alert alert-info mt-3" role="alert">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Informasi:</strong> Dataset ini menunjukkan suhu permukaan laut (SPL) di perairan Indonesia. SPL adalah parameter penting yang mempengaruhi distribusi biota laut dan produktivitas perairan.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="/static/js/main_fixed.js"></script>
+<!-- <script src="/static/js/filter-controls.js"></script> -->
+
+
+<script>
+// Inisialisasi peta Klorofil-a dan SPL
+let mapChloro, mapSST;
+let currentChloroLayer = null;
+let currentSSTLayer = null;
+
+// Cache untuk data GeoJSON
+const geoJsonCache = {
+    chloro: {},
+    sst: {}
+};
+
+// Fungsi untuk menginisialisasi peta
+function initMaps() {
+    // Inisialisasi peta Klorofil-a
+    mapChloro = L.map('mapChloro').setView([-2.5, 118], 5);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(mapChloro);
+
+    // Inisialisasi peta SPL
+    mapSST = L.map('mapSST').setView([-2.5, 118], 5);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(mapSST);
+
+    // Load data untuk bulan Februari (default)
+    loadMapData('2');
+}
+
+// Fungsi untuk memuat data peta berdasarkan bulan
+function loadMapData(month) {
+    // Konversi angka bulan ke nama bulan
+    const monthNames = ["januari", "februari", "maret", "april", "mei", "juni", 
+                        "juli", "agustus", "september", "oktober", "november", "desember"];
+    const monthName = monthNames[parseInt(month) - 1];
+    const monthNum = parseInt(month);
+    
+    // Periksa apakah data tersedia (hanya Januari-Juni)
+    const isDataAvailable = monthNum >= 1 && monthNum <= 6;
+    
+    if (!isDataAvailable) {
+        // Tampilkan pesan data tidak tersedia
+        const chloroPopup = L.popup()
+            .setLatLng(mapChloro.getCenter())
+            .setContent(`<div class="alert alert-warning"><i class="fas fa-exclamation-triangle me-2"></i>Data klorofil-a untuk bulan ${monthName} belum tersedia</div>`)
+            .openOn(mapChloro);
+            
+        const sstPopup = L.popup()
+            .setLatLng(mapSST.getCenter())
+            .setContent(`<div class="alert alert-warning"><i class="fas fa-exclamation-triangle me-2"></i>Data SPL untuk bulan ${monthName} belum tersedia</div>`)
+            .openOn(mapSST);
+            
+        // Tambahkan event listener untuk menutup popup saat peta diklik
+        mapChloro.on('click', function() {
+            mapChloro.closePopup(chloroPopup);
+        });
+        
+        mapSST.on('click', function() {
+            mapSST.closePopup(sstPopup);
+        });
+            
+        // Tambahkan layer kosong untuk mencegah error
+        if (currentChloroLayer) {
+            mapChloro.removeLayer(currentChloroLayer);
+        }
+        currentChloroLayer = L.layerGroup().addTo(mapChloro);
+        
+        if (currentSSTLayer) {
+            mapSST.removeLayer(currentSSTLayer);
+        }
+        currentSSTLayer = L.layerGroup().addTo(mapSST);
+        
+        // Simpan data kosong ke cache
+        geoJsonCache.chloro[monthName] = { type: "FeatureCollection", features: [] };
+        geoJsonCache.sst[monthName] = { type: "FeatureCollection", features: [] };
+        
+        return;
+    }
+
+    // Load data Klorofil-a
+    if (currentChloroLayer) {
+        mapChloro.removeLayer(currentChloroLayer);
+    }
+
+    const chloroUrl = `/static/data/geojson/cloro/${monthName}_cloro.geojson`;
+
+    // Cek cache terlebih dahulu
+    if (geoJsonCache.chloro[monthName]) {
+        // Gunakan data dari cache
+        const data = geoJsonCache.chloro[monthName];
+        renderChloroMap(data);
+    } else {
+        // Load dari server dan simpan ke cache
+        fetch(chloroUrl)
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error('Data tidak tersedia');
+                }
+            })
+            .then(data => {
+                // Simpan ke cache
+                geoJsonCache.chloro[monthName] = data;
+                renderChloroMap(data);
+            })
+            .catch(error => {
+                console.error('Error loading chlorophyll data:', error);
+                // Tampilkan pesan error pada peta
+                L.popup()
+                    .setLatLng(mapChloro.getCenter())
+                    .setContent('<div class="alert alert-warning">Data klorofil-a untuk bulan ini belum tersedia</div>')
+                    .openOn(mapChloro);
+                
+                // Tambahkan layer kosong untuk mencegah error
+                currentChloroLayer = L.layerGroup().addTo(mapChloro);
+            });
+    }
+
+    // Fungsi untuk merender peta klorofil
+    function renderChloroMap(data) {
+        // Hapus layer sebelumnya jika ada
+        if (currentChloroLayer) {
+            mapChloro.removeLayer(currentChloroLayer);
+        }
+
+        // Gunakan requestAnimationFrame untuk rendering yang lebih halus
+        requestAnimationFrame(() => {
+            // Optimasi rendering dengan canvas
+            currentChloroLayer = L.geoJSON(data, {
+                style: function(feature) {
+                    const gridcode = feature.properties.gridcode;
+                    let color;
+
+                    switch(gridcode) {
+                        case 1: color = '#1a9850'; break; // Sangat Rendah
+                        case 2: color = '#91cf60'; break; // Rendah
+                        case 3: color = '#fee08b'; break; // Sedang
+                        case 4: color = '#fc8d59'; break; // Tinggi
+                        default: color = '#d73027'; // Sangat Tinggi
+                    }
+
+                    return {
+                        fillColor: color,
+                        weight: 1,
+                        opacity: 1,
+                        color: 'white',
+                        fillOpacity: 0.7
+                    };
+                },
+                onEachFeature: function(feature, layer) {
+                    if (feature.properties) {
+                        // Optimasi popup dengan event click
+                        layer.on({
+                            click: function(e) {
+                                const props = feature.properties;
+                                let popupContent = '<div class="popup-content">';
+
+                                // Tampilkan properti penting saja
+                                if (props.gridcode !== undefined) {
+                                    let level;
+                                    switch(props.gridcode) {
+                                        case 1: level = 'Sangat Rendah'; break;
+                                        case 2: level = 'Rendah'; break;
+                                        case 3: level = 'Sedang'; break;
+                                        case 4: level = 'Tinggi'; break;
+                                        default: level = 'Tidak Diketahui';
+                                    }
+                                    popupContent += `<p><b>Tingkat Klorofil-a:</b> ${level}</p>`;
+                                }
+
+                                popupContent += '</div>';
+                                L.popup()
+                                    .setLatLng(e.latlng)
+                                    .setContent(popupContent)
+                                    .openOn(mapChloro);
+                            }
+                        });
+                    }
+                }
+            }).addTo(mapChloro);
+        });
+    }
+
+    // Load data SPL
+    if (currentSSTLayer) {
+        mapSST.removeLayer(currentSSTLayer);
+    }
+
+    // const sstUrl = `/static/data/geojson/sst/${monthName}_sst.geojson`;
+
+    // Cek cache terlebih dahulu
+    if (geoJsonCache.sst[monthName]) {
+        // Gunakan data dari cache
+        const data = geoJsonCache.sst[monthName];
+        renderSSTMap(data);
+    } else {
+        // Load dari server dan simpan ke cache
+        fetch(sstUrl)
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error('Data tidak tersedia');
+                }
+            })
+            .then(data => {
+                // Simpan ke cache
+                geoJsonCache.sst[monthName] = data;
+                renderSSTMap(data);
+            })
+            .catch(error => {
+                console.error('Error loading SST data:', error);
+                // Tampilkan pesan error pada peta
+                L.popup()
+                    .setLatLng(mapSST.getCenter())
+                    .setContent('<div class="alert alert-warning">Data SPL untuk bulan ini belum tersedia</div>')
+                    .openOn(mapSST);
+                
+                // Tambahkan layer kosong untuk mencegah error
+                currentSSTLayer = L.layerGroup().addTo(mapSST);
+            });
+    }
+
+    // Fungsi untuk merender peta SPL
+    function renderSSTMap(data) {
+        // Hapus layer sebelumnya jika ada
+        if (currentSSTLayer) {
+            mapSST.removeLayer(currentSSTLayer);
+        }
+
+        // Gunakan requestAnimationFrame untuk rendering yang lebih halus
+        requestAnimationFrame(() => {
+            // Optimasi rendering dengan canvas
+            currentSSTLayer = L.geoJSON(data, {
+                style: function(feature) {
+                    const gridcode = feature.properties.gridcode;
+                    let color;
+
+                    switch(gridcode) {
+                        case 1: color = '#2c7bb6'; break; // Sangat Dingin
+                        case 2: color = '#00a6ca'; break; // Dingin
+                        case 3: color = '#fdae61'; break; // Normal
+                        case 4: color = '#f46d43'; break; // Panas
+                        default: color = '#d73027'; // Sangat Panas
+                    }
+
+                    return {
+                        fillColor: color,
+                        weight: 1,
+                        opacity: 1,
+                        color: 'white',
+                        fillOpacity: 0.7
+                    };
+                },
+                onEachFeature: function(feature, layer) {
+                    if (feature.properties) {
+                        // Optimasi popup dengan event click
+                        layer.on({
+                            click: function(e) {
+                                const props = feature.properties;
+                                let popupContent = '<div class="popup-content">';
+
+                                // Tampilkan properti penting saja
+                                if (props.gridcode !== undefined) {
+                                    let level;
+                                    switch(props.gridcode) {
+                                        case 1: level = 'Sangat Dingin (<25°C)'; break;
+                                        case 2: level = 'Dingin (25-27°C)'; break;
+                                        case 3: level = 'Normal (27-29°C)'; break;
+                                        case 4: level = 'Panas (>29°C)'; break;
+                                        default: level = 'Tidak Diketahui';
+                                    }
+                                    popupContent += `<p><b>Suhu Permukaan Laut:</b> ${level}</p>`;
+                                }
+
+                                popupContent += '</div>';
+                                L.popup()
+                                    .setLatLng(e.latlng)
+                                    .setContent(popupContent)
+                                    .openOn(mapSST);
+                            }
+                        });
+                    }
+                }
+            }).addTo(mapSST);
+        });
+    }
+}
+
+// Event listener untuk filter
+document.getElementById('apply-filters').addEventListener('click', function() {
+    // Tampilkan loading indicator
+    document.getElementById('loading-indicator').style.display = 'block';
+
+    // Nonaktifkan tombol untuk mencegah klik ganda
+    const applyBtn = document.getElementById('apply-filters');
+    applyBtn.disabled = true;
+    applyBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Memuat Data...';
+
+    const month = document.getElementById('month-filter').value;
+    const monthNum = parseInt(month);
+    
+    // Periksa apakah data tersedia (hanya Januari-Juni)
+    const isDataAvailable = monthNum >= 1 && monthNum <= 6;
+    
+    // Cek apakah data sudah ada di cache
+    const monthNames = ["januari", "februari", "maret", "april", "mei", "juni", 
+                        "juli", "agustus", "september", "oktober", "november", "desember"];
+    const monthName = monthNames[monthNum - 1];
+    
+    if (!isDataAvailable) {
+        // Data tidak tersedia, tampilkan notifikasi
+        const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni",
+                            "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+        const selectedMonth = monthNames[monthNum - 1];
+        
+        // Tampilkan notifikasi informasi
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'alert alert-warning alert-dismissible fade show position-fixed';
+        alertDiv.style.top = '20px';
+        alertDiv.style.right = '20px';
+        alertDiv.style.zIndex = '9999';
+        alertDiv.innerHTML = `
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <strong>Informasi:</strong> Data untuk bulan ${selectedMonth} belum tersedia. Data hanya tersedia untuk bulan Januari hingga Juni.
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        document.body.appendChild(alertDiv);
+        
+        // Hapus notifikasi setelah 8 detik
+        setTimeout(() => {
+            alertDiv.remove();
+        }, 8000);
+        
+        // Tampilkan peta kosong
+        renderEmptyMaps();
+        
+        // Sembunyikan loading indicator setelah jeda singkat
+        setTimeout(() => {
+            document.getElementById('loading-indicator').style.display = 'none';
+            applyBtn.disabled = false;
+            applyBtn.innerHTML = '<i class="fas fa-check me-2"></i>Terapkan Filter';
+        }, 300);
+    } else if (geoJsonCache.chloro[monthName] && geoJsonCache.sst[monthName]) {
+        // Data sudah ada di cache, tampilkan langsung
+        renderMapsWithCachedData(monthName);
+
+        // Sembunyikan loading indicator setelah jeda singkat
+        setTimeout(() => {
+            document.getElementById('loading-indicator').style.display = 'none';
+            applyBtn.disabled = false;
+            applyBtn.innerHTML = '<i class="fas fa-check me-2"></i>Terapkan Filter';
+        }, 300);
+    } else {
+        // Data belum ada di cache, muat dengan Promise.all untuk paralel loading
+        Promise.all([
+            loadChloroData(monthName),
+            loadSSTData(monthName)
+        ]).then(() => {
+            // Tampilkan peta dengan data yang baru dimuat
+            renderMapsWithCachedData(monthName);
+            console.log("Data berhasil dimuat dan peta diperbarui");
+            
+            // Sembunyikan loading indicator setelah data selesai dimuat
+            document.getElementById('loading-indicator').style.display = 'none';
+            applyBtn.disabled = false;
+            applyBtn.innerHTML = '<i class="fas fa-check me-2"></i>Terapkan Filter';
+        }).catch(error => {
+            console.error('Error loading map data:', error);
+            document.getElementById('loading-indicator').style.display = 'none';
+            applyBtn.disabled = false;
+            applyBtn.innerHTML = '<i class="fas fa-check me-2"></i>Terapkan Filter';
+            
+            // Tampilkan peta dengan data kosong untuk mencegah error
+            renderEmptyMaps();
+
+            // Tampilkan notifikasi error
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-warning alert-dismissible fade show position-fixed';
+            alertDiv.style.top = '20px';
+            alertDiv.style.right = '20px';
+            alertDiv.style.zIndex = '9999';
+            alertDiv.innerHTML = `
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <strong>Informasi:</strong> Data untuk bulan ${monthName} belum tersedia. Data hanya tersedia untuk bulan Januari hingga Juni.
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(alertDiv);
+
+            // Hapus notifikasi setelah 8 detik
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 8000);
+        });
+    }
+});
+
+// Fungsi untuk menampilkan peta kosong
+function renderEmptyMaps() {
+    // Hapus layer sebelumnya jika ada
+    if (currentChloroLayer) {
+        mapChloro.removeLayer(currentChloroLayer);
+    }
+    if (currentSSTLayer) {
+        mapSST.removeLayer(currentSSTLayer);
+    }
+    
+    // Tambahkan layer kosong untuk mencegah error
+    currentChloroLayer = L.layerGroup().addTo(mapChloro);
+    currentSSTLayer = L.layerGroup().addTo(mapSST);
+}
+
+// Fungsi untuk menampilkan peta dengan data dari cache
+function renderMapsWithCachedData(monthName) {
+    console.log(`Menampilkan peta untuk bulan: ${monthName}`);
+    // Load data Klorofil-a dari cache
+    if (currentChloroLayer) {
+        mapChloro.removeLayer(currentChloroLayer);
+    }
+    
+    const chloroData = geoJsonCache.chloro[monthName];
+    if (chloroData && chloroData.features && chloroData.features.length > 0) {
+        console.log(`Menampilkan data Klorofil-a untuk bulan: ${monthName}`);
+        renderChloroMap(chloroData);
+    } else {
+        console.log(`Data Klorofil-a untuk bulan ${monthName} tidak tersedia atau kosong`);
+        // Tampilkan pesan data tidak tersedia
+        L.popup()
+            .setLatLng(mapChloro.getCenter())
+            .setContent(`<div class="alert alert-warning"><i class="fas fa-exclamation-triangle me-2"></i>Data klorofil-a untuk bulan ${monthName} belum tersedia</div>`)
+            .openOn(mapChloro);
+        
+        // Tambahkan layer kosong untuk mencegah error
+        currentChloroLayer = L.layerGroup().addTo(mapChloro);
+    }
+    
+    // Load data SPL dari cache
+    if (currentSSTLayer) {
+        mapSST.removeLayer(currentSSTLayer);
+    }
+    
+    const sstData = geoJsonCache.sst[monthName];
+    if (sstData && sstData.features && sstData.features.length > 0) {
+        console.log(`Menampilkan data SPL untuk bulan: ${monthName}`);
+        renderSSTMap(sstData);
+    } else {
+        console.log(`Data SPL untuk bulan ${monthName} tidak tersedia atau kosong`);
+        // Tampilkan pesan data tidak tersedia
+        L.popup()
+            .setLatLng(mapSST.getCenter())
+            .setContent(`<div class="alert alert-warning"><i class="fas fa-exclamation-triangle me-2"></i>Data SPL untuk bulan ${monthName} belum tersedia</div>`)
+            .openOn(mapSST);
+        
+        // Tambahkan layer kosong untuk mencegah error
+        currentSSTLayer = L.layerGroup().addTo(mapSST);
+    }
+}
+
+// Fungsi untuk memuat data Klorofil-a
+// Fungsi untuk memuat data Klorofil-a
+function loadChloroData(monthName) {
+    return new Promise((resolve, reject) => {
+        if (geoJsonCache.chloro[monthName]) {
+            console.log(`Data Klorofil-a ${monthName} sudah ada di cache`);
+            resolve();
+            return;
+        }
+
+        const availableMonths = ["januari", "februari", "maret", "april", "mei", "juni"];
+        if (!availableMonths.includes(monthName)) {
+            console.warn(`Data Klorofil-a untuk bulan ${monthName} tidak tersedia`);
+            geoJsonCache.chloro[monthName] = { type: "FeatureCollection", features: [] };
+            resolve();
+            return;
+        }
+
+        // === PERBAIKAN PATH ===
+        const chloroUrl = `/static/data/geojson/cloro/${monthName}_cloro.geojson`;
+        console.log(`Memuat data Klorofil-a dari: ${chloroUrl}`);
+
+        fetch(chloroUrl)
+            .then(response => {
+                if (!response.ok) throw new Error(`Data klorofil-a untuk bulan ${monthName} tidak ditemukan (${response.status})`);
+                return response.json();
+            })
+            .then(data => {
+                geoJsonCache.chloro[monthName] = data;
+                console.log(`✅ Data Klorofil-a ${monthName} berhasil dimuat`);
+                resolve();
+            })
+            .catch(error => {
+                console.error(`❌ Gagal memuat Klorofil-a ${monthName}:`, error);
+                geoJsonCache.chloro[monthName] = { type: "FeatureCollection", features: [] };
+                resolve();
+            });
+    });
+}
+
+// Fungsi untuk memuat data SPL
+function loadSSTData(monthName) {
+    return new Promise((resolve, reject) => {
+        if (geoJsonCache.sst[monthName]) {
+            console.log(`Data SPL ${monthName} sudah ada di cache`);
+            resolve();
+            return;
+        }
+
+        const availableMonths = ["januari", "februari", "maret", "april", "mei", "juni"];
+        if (!availableMonths.includes(monthName)) {
+            console.warn(`Data SPL untuk bulan ${monthName} tidak tersedia`);
+            geoJsonCache.sst[monthName] = { type: "FeatureCollection", features: [] };
+            resolve();
+            return;
+        }
+
+        // === PERBAIKAN PATH ===
+        const sstUrl = `/static/data/geojson/sst/${monthName}_sst.geojson`;
+        console.log(`Memuat data SPL dari: ${sstUrl}`);
+
+        fetch(sstUrl)
+            .then(response => {
+                if (!response.ok) throw new Error(`Data SPL untuk bulan ${monthName} tidak ditemukan (${response.status})`);
+                return response.json();
+            })
+            .then(data => {
+                geoJsonCache.sst[monthName] = data;
+                console.log(`✅ Data SPL ${monthName} berhasil dimuat`);
+                resolve();
+            })
+            .catch(error => {
+                console.error(`❌ Gagal memuat SPL ${monthName}:`, error);
+                geoJsonCache.sst[monthName] = { type: "FeatureCollection", features: [] };
+                resolve();
+            });
+    });
+}
+
+// Memuat peta berdasarkan bulan
+function loadMapData(month) {
+    const monthNames = ["januari", "februari", "maret", "april", "mei", "juni",
+                        "juli", "agustus", "september", "oktober", "november", "desember"];
+    const monthName = monthNames[parseInt(month) - 1];
+
+    Promise.all([
+        loadChloroData(monthName),
+        loadSSTData(monthName)
+    ]).then(() => {
+        console.log(`🔄 Menampilkan data peta untuk bulan ${monthName}`);
+
+        // Hapus layer sebelumnya
+        if (currentChloroLayer) mapChloro.removeLayer(currentChloroLayer);
+        if (currentSSTLayer) mapSST.removeLayer(currentSSTLayer);
+
+        // Render peta
+        renderChloroMap(geoJsonCache.chloro[monthName]);
+        renderSSTMap(geoJsonCache.sst[monthName]);
+    });
+}
+
+// Inisialisasi peta ketika halaman dimuat
+document.addEventListener('DOMContentLoaded', () => {
+    if (typeof L !== 'undefined') {
+        initMaps();
+        preloadDefaultData();
+    } else {
+        setTimeout(() => {
+            initMaps();
+            preloadDefaultData();
+        }, 1000);
+    }
+});
+
+// Preload data default (Februari)
+function preloadDefaultData() {
+    const defaultMonth = 'februari';
+    console.log('Preloading data untuk bulan', defaultMonth);
+
+    Promise.all([
+        loadChloroData(defaultMonth),
+        loadSSTData(defaultMonth)
+    ]).then(() => {
+        renderChloroMap(geoJsonCache.chloro[defaultMonth]);
+        renderSSTMap(geoJsonCache.sst[defaultMonth]);
+    });
+}
+
+
+</script>
+
+<!-- Stats Cards -->
+<section class="stats-section mb-5">
+    <div class="container">
+        <div class="row g-4 justify-content-center">
+            <div class="col-md-4">
+                <div class="card stats-card bg-primary text-white">
+                    <div class="card-body text-center">
+                        <i class="fas fa-thermometer-half fa-3x mb-3"></i>
+                        <h3 class="card-title">SPL</h3>
+                        <p class="card-text display-6" id="spl-value">28.5°C</p>
+                        <small class="card-text">Suhu Permukaan Laut</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card stats-card bg-success text-white">
+                    <div class="card-body text-center">
+                        <i class="fas fa-leaf fa-3x mb-3"></i>
+                        <h3 class="card-title">Klorofil-a</h3>
+                        <p class="card-text display-6" id="klorofil-value">0.35 mg/m³</p>
+                        <small class="card-text">Konsentrasi Klorofil</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card stats-card bg-warning text-white">
+                    <div class="card-body text-center">
+                        <i class="fas fa-fish fa-3x mb-3"></i>
+                        <h3 class="card-title">Populasi Ikan</h3>
+                        <p class="card-text display-6" id="fish-value">105 ton</p>
+                        <small class="card-text">Estimasi Populasi</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+<!-- Charts Section -->
+<section class="charts-section mb-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6 mb-4">
+                <div class="card shadow h-100">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Grafik SPL dan Klorofil-a</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="spl-chlorophyll-chart"></canvas>
+                        <div class="alert alert-info mt-3" role="alert">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Analisis Parameter Oseanografi:</strong> <span id="trend-analysis">SPL (Suhu Permukaan Laut) menunjukkan fluktuasi normal antara 28-30°C, sementara Klorofil-a menunjukkan peningkatan di area timur Indonesia, mengindikasikan produktivitas primer yang tinggi dan potensi lokasi penangkapan ikan yang baik.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 mb-4">
+                <div class="card shadow h-100">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0"><i class="fas fa-fish me-2"></i>Dinamika Populasi Ikan</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-lg-8">
+                                <canvas id="fish-chart"></canvas>
+                                <div class="alert alert-success mt-3" role="alert">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <strong>Analisis Populasi:</strong> <span id="population-analysis">Populasi ikan menunjukkan pola musiman dengan peningkatan signifikan pada bulan-bulan tertentu, berkorelasi dengan fluktuasi klorofil-a dan SPL di wilayah tersebut.</span>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="card bg-light h-100">
+                                    <div class="card-body">
+                                        <h6 class="card-title">Analisis Korelasi</h6>
+                                        <div class="mb-3">
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <span>SPL vs Populasi</span>
+                                                <span class="badge bg-primary">0.75</span>
+                                            </div>
+                                            <div class="progress" style="height: 6px;">
+                                                <div class="progress-bar bg-primary" style="width: 75%"></div>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <span>Klorofil-a vs Populasi</span>
+                                                <span class="badge bg-success">0.82</span>
+                                            </div>
+                                            <div class="progress" style="height: 6px;">
+                                                <div class="progress-bar bg-success" style="width: 82%"></div>
+                                            </div>
+                                        </div>
+                                        <hr>
+                                        <p class="small text-muted">Korelasi menunjukkan seberapa kuat hubungan antara parameter oseanografi dengan populasi ikan. Nilai mendekati 1 menunjukkan korelasi positif yang kuat.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    fetch('/api/ocean_data')
+      .then(response => response.json())
+      .then(data => {
+        console.log("Data diterima dari Flask:", data);
+    
+        // Pastikan elemen canvas ada
+        const ctx = document.getElementById('fish-chart');
+        if (!ctx) {
+          console.error("Elemen #fish-chart tidak ditemukan di HTML");
+          return;
+        }
+    
+        // Buat grafik populasi ikan
+        new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: data.dates, // Nama bulan
+            datasets: [{
+              label: 'Total Populasi Ikan',
+              data: data.populasi,
+              backgroundColor: 'rgba(54, 162, 235, 0.5)',
+              borderColor: 'rgba(54, 162, 235, 1)',
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            scales: {
+              y: {
+                beginAtZero: true,
+                title: {
+                  display: true,
+                  text: 'Jumlah Ikan'
+                }
+              },
+              x: {
+                title: {
+                  display: true,
+                  text: 'Bulan'
+                }
+              }
+            }
+          }
+        });
+      })
+      .catch(error => console.error("Gagal memuat data populasi ikan:", error));
+    </script>
+    
+
+
+
+<!-- AI Chatbot Section -->
+<section class="ai-chatbot-section mb-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="chatbot-container">
+                    <div class="chatbot-header">
+                        <h5><i class="fas fa-robot"></i> OceanMood AssistantAI <span class="chatbot-ai-badge">AI</span></h5>
+                        <div class="chatbot-status">
+                            <div class="status-indicator"></div>
+                            <span>Online</span>
+                        </div>
+                    </div>
+                    <div class="chatbot-body" id="chatbot-body-dashboard">
+                        <div class="chat-message bot-message">
+                            <div class="message-bubble">
+                                <p>Halo! Saya OceanMood AssistantAI, asisten cerdas untuk analisis data kelautan. Saya dapat membantu Anda dengan:</p>
+                                <ul>
+                                    <li>Grafik SPL dan Klorofil-a</li>
+                                    <li>Rekomendasi lokasi penangkapan terbaik</li>
+                                    <li>Identifikasi pola perubahan iklim</li>
+                                </ul>
+                                <p>Apa yang ingin Anda ketahui hari ini?</p>
+                                <div class="message-time">Hari ini, <span id="current-time"></span></div>
+                            </div>
+                        </div>
+                        <div class="chatbot-thinking" id="chatbot-thinking-dashboard">
+                            <i class="fas fa-spinner"></i>
+                            OceanMood AssistantAI sedang berpikir...
+                        </div>
+                    </div>
+                    <div class="chatbot-footer">
+                        <div class="chatbot-input-group">
+                            <input type="text" class="chatbot-input" id="chatbot-input-dashboard" placeholder="Ketik pertanyaan Anda...">
+                            <button class="chatbot-send-btn" id="chatbot-send-dashboard">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                        <div class="chatbot-suggestions">
+                            <div class="suggestion-chip" data-query="Lokasi mana yang memiliki populasi ikan tertinggi?">Lokasi Terbaik</div>
+                            <div class="suggestion-chip" data-query="Apa dampak kenaikan SPL terhadap populasi ikan?">Dampak SPL</div>
+                            <div class="suggestion-chip" data-query="Berikan rekomendasi untuk penangkapan ikan yang berkelanjutan">Rekomendasi</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Team Section -->
+<section class="team-section py-5" id="team">
+    <div class="container">
+        <div class="team-container bg-white rounded-3 shadow-lg p-5 mb-5">
+            <div class="text-center mb-5">
+                <div class="bg-primary py-4 rounded-top-3">
+                    <h2 class="section-title position-relative d-inline-block text-white">Our Team</h2>
+                    <p class="mt-3 text-white-50">Meet the experts behind OceanMood</p>
+                </div>
+            </div>
+
+        <div class="team-carousel-container position-relative bg-light rounded-3 p-4">
+            <!-- Navigation Buttons -->
+            <button class="team-nav-btn team-prev-btn" id="team-prev-btn">
+                <i class="fas fa-chevron-left text-white"></i>
+            </button>
+            <button class="team-nav-btn team-next-btn" id="team-next-btn">
+                <i class="fas fa-chevron-right text-white"></i>
+            </button>
+
+            <!-- Team Carousel -->
+            <div class="team-carousel" id="team-carousel">
+                <!-- Team Member 1 -->
+                <div class="team-member-card">
+                    <div class="team-member-inner">
+                        <div class="member-image-container">
+                            <img src="https://github.com/rafliandipura/Tugas-PBO/blob/main/sakila%202.jpg?raw=true " alt="Team Member" class="member-image">
+                            <div class="member-overlay">
+                                <div class="overlay-content">
+                                    <h5 class="text-white">Sakila Divia Fitriyani</h5>
+                                    <p class="text-warning mb-2">2302023</p>
+                                    <p class="text-white small mb-3">Sistem Informasi Kelautan</p>
+                                    <div class="d-flex justify-content-center">
+                                        <a href="#" class="social-icon text-white mx-2"><i class="fab fa-linkedin"></i></a>
+                                        <a href="#" class="social-icon text-white mx-2"><i class="fab fa-twitter"></i></a>
+                                        <a href="#" class="social-icon text-white mx-2"><i class="fas fa-envelope"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Team Member 2 -->
+                <div class="team-member-card">
+                    <div class="team-member-inner">
+                        <div class="member-image-container">
+                            <img src="https://github.com/rafliandipura/weatherprediction/blob/main/Rafli.jpg?raw=true" alt="Team Member" class="member-image">
+                            <div class="member-overlay">
+                                <div class="overlay-content">
+                                    <h5 class="text-white">Raflian Khansa Dipura</h5>
+                                    <p class="text-warning mb-2">2309694</p>
+                                    <p class="text-white small mb-3">Sistem Informasi Kelautan</p>
+                                    <div class="d-flex justify-content-center">
+                                        <a href="#" class="social-icon text-white mx-2"><i class="fab fa-linkedin"></i></a>
+                                        <a href="#" class="social-icon text-white mx-2"><i class="fab fa-twitter"></i></a>
+                                        <a href="#" class="social-icon text-white mx-2"><i class="fas fa-envelope"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Team Member 3 -->
+                <div class="team-member-card">
+                    <div class="team-member-inner">
+                        <div class="member-image-container">
+                            <img src="https://github.com/rafliandipura/Tugas-PBO/blob/main/alia%20asik.jpg?raw=true" alt="Team Member" class="member-image">
+                            <div class="member-overlay">
+                                <div class="overlay-content">
+                                    <h5 class="text-white">Alia Selvi Solekhah</h5>
+                                    <p class="text-warning mb-2">2301121</p>
+                                    <p class="text-white small mb-3">Sistem Informasi Kelautan</p>
+                                    <div class="d-flex justify-content-center">
+                                        <a href="#" class="social-icon text-white mx-2"><i class="fab fa-linkedin"></i></a>
+                                        <a href="#" class="social-icon text-white mx-2"><i class="fab fa-twitter"></i></a>
+                                        <a href="#" class="social-icon text-white mx-2"><i class="fas fa-envelope"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Team Member 4 -->
+                <div class="team-member-card">
+                    <div class="team-member-inner">
+                        <div class="member-image-container">
+                            <img src="https://github.com/rafliandipura/Tugas-PBO/blob/main/dini%20asik.jpg?raw=true" alt="Team Member" class="member-image">
+                            <div class="member-overlay">
+                                <div class="overlay-content">
+                                    <h5 class="text-white">Dini Dwi Andini</h5>
+                                    <p class="text-warning mb-2">2308802</p>
+                                    <p class="text-white small mb-3">Sistem Informasi Kelautan</p>
+                                    <div class="d-flex justify-content-center">
+                                        <a href="#" class="social-icon text-white mx-2"><i class="fab fa-linkedin"></i></a>
+                                        <a href="#" class="social-icon text-white mx-2"><i class="fab fa-twitter"></i></a>
+                                        <a href="#" class="social-icon text-white mx-2"><i class="fas fa-envelope"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Team Member Details (Initially Hidden) -->
+            <div class="team-member-details" id="team-member-details">
+                <div class="details-content">
+                    <button class="close-details-btn" id="close-details-btn">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <div class="row align-items-center">
+                        <div class="col-md-4">
+                            <img src="" alt="Team Member" class="details-image" id="details-image">
+                        </div>
+                        <div class="col-md-8">
+                            <h3 id="details-name" class="text-primary"></h3>
+                            <p class="text-info mb-2" id="details-id"></p>
+                            <p class="text-secondary mb-3" id="details-position"></p>
+                            <p id="details-description"></p>
+                            <div class="mt-4">
+                                <a href="#" class="social-icon text-muted mx-2"><i class="fab fa-linkedin"></i></a>
+                                <a href="#" class="social-icon text-muted mx-2"><i class="fab fa-twitter"></i></a>
+                                <a href="#" class="social-icon text-muted mx-2"><i class="fas fa-envelope"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    /* Team Section Styles */
+    .team-section {
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        position: relative;
+        overflow: hidden;
+        color: #212529; /* Warna teks hitam untuk kontras */
+        padding: 60px 0;
+    }
+
+    /* Legend styles */
+    .legend {
+        background: white;
+        padding: 10px;
+        line-height: 1.4em;
+        border-radius: 8px;
+        box-shadow: 0 0 8px rgba(0,0,0,0.3);
+    }
+
+    .team-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .team-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%23ffffff" fill-opacity="0.1" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,154.7C960,171,1056,181,1152,165.3C1248,149,1344,107,1392,85.3L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') no-repeat bottom;
+        background-size: cover;
+        z-index: 0;
+    }
+
+    .section-title {
+        font-weight: 700;
+        padding-bottom: 15px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 70px;
+        height: 3px;
+        background: #ffffff;
+        border-radius: 3px;
+    }
+
+    .team-container .bg-primary {
+        margin: -20px -20px 20px -20px;
+    }
+
+    /* Team Carousel Styles */
+    .team-carousel-container {
+        position: relative;
+        width: 100%;
+        overflow: hidden;
+        padding: 40px 0;
+        z-index: 1;
+    }
+
+    .team-carousel {
+        display: flex;
+        transition: transform 0.5s ease;
+        padding: 0 50px;
+    }
+
+    .team-member-card {
+        flex: 0 0 250px;
+        margin: 0 15px;
+        transition: all 0.4s ease;
+        opacity: 0.7;
+        transform: scale(0.9);
+        filter: blur(1px);
+    }
+
+    .team-member-card.active {
+        opacity: 1;
+        transform: scale(1);
+        filter: blur(0);
+        z-index: 10;
+    }
+
+    .team-member-inner {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        cursor: pointer;
+        transition: all 0.4s ease;
+        height: 350px;
+    }
+
+    .team-member-card.active .team-member-inner {
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    }
+
+    .member-image-container {
+        position: relative;
+        height: 100%;
+        overflow: hidden;
+    }
+
+    .member-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+
+    .team-member-card.active .member-image {
+        transform: scale(1.05);
+    }
+
+    .member-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.5));
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding: 20px;
+        opacity: 0;
+        transition: opacity 0.4s ease;
+    }
+
+    .team-member-card.active .member-overlay {
+        opacity: 1;
+    }
+
+    .overlay-content {
+        transform: translateY(20px);
+        transition: transform 0.4s ease;
+    }
+
+    .team-member-card.active .overlay-content {
+        transform: translateY(0);
+    }
+
+    .social-icon {
+        font-size: 1.2rem;
+        transition: transform 0.3s ease, color 0.3s ease;
+    }
+
+    .social-icon:hover {
+        transform: translateY(-3px);
+        color: #ffffff !important;
+        text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+    }
+
+    /* Navigation Buttons */
+    .team-nav-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: #212529;
+        border: 1px solid #212529;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 20;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .team-nav-btn:hover {
+        background: #343a40;
+        transform: translateY(-50%) scale(1.1);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+    }
+
+    .team-prev-btn {
+        left: 10px;
+    }
+
+    .team-next-btn {
+        right: 10px;
+    }
+
+    /* Team Member Details */
+    .team-member-details {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(5px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .team-member-details.active {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .details-content {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        max-width: 800px;
+        width: 90%;
+        max-height: 90vh;
+        overflow-y: auto;
+        position: relative;
+        transform: scale(0.9);
+        transition: transform 0.3s ease;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        color: #212529; /* Warna teks gelap untuk kontras dengan background terang */
+    }
+
+    .team-member-details.active .details-content {
+        transform: scale(1);
+    }
+
+    .close-details-btn {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.1);
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .close-details-btn:hover {
+        background: rgba(0, 0, 0, 0.2);
+        transform: rotate(90deg);
+        color: #dc3545;
+    }
+
+    .details-image {
+        width: 100%;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .team-member-card {
+            flex: 0 0 200px;
+        }
+
+        .team-nav-btn {
+            width: 40px;
+            height: 40px;
+        }
+
+        .team-prev-btn {
+            left: 5px;
+        }
+
+        .team-next-btn {
+            right: 5px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .team-member-card {
+            flex: 0 0 180px;
+        }
+
+        .team-member-inner {
+            height: 300px;
+        }
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const teamCarousel = document.getElementById('team-carousel');
+    const teamMemberCards = document.querySelectorAll('.team-member-card');
+    const prevBtn = document.getElementById('team-prev-btn');
+    const nextBtn = document.getElementById('team-next-btn');
+    const memberDetails = document.getElementById('team-member-details');
+    const closeDetailsBtn = document.getElementById('close-details-btn');
+    const detailsImage = document.getElementById('details-image');
+    const detailsName = document.getElementById('details-name');
+    const detailsId = document.getElementById('details-id');
+    const detailsPosition = document.getElementById('details-position');
+    const detailsDescription = document.getElementById('details-description');
+
+    let currentIndex = 0;
+    let cardWidth = 280; // card width + margin
+    let autoScrollInterval;
+    let isDragging = false;
+    let startPos = 0;
+    let currentTranslate = 0;
+    let prevTranslate = 0;
+    let animationID;
+
+    // Set initial active card
+    setActiveCard(currentIndex);
+
+    // Initialize auto-scroll
+    startAutoScroll();
+
+    // Navigation button event listeners
+    prevBtn.addEventListener('click', () => {
+        navigateCarousel(-1);
+        resetAutoScroll();
+    });
+
+    nextBtn.addEventListener('click', () => {
+        navigateCarousel(1);
+        resetAutoScroll();
+    });
+
+    // Touch/mouse events for drag scrolling
+    teamCarousel.addEventListener('mousedown', dragStart);
+    teamCarousel.addEventListener('touchstart', dragStart);
+    teamCarousel.addEventListener('mouseup', dragEnd);
+    teamCarousel.addEventListener('touchend', dragEnd);
+    teamCarousel.addEventListener('mousemove', drag);
+    teamCarousel.addEventListener('touchmove', drag);
+    teamCarousel.addEventListener('mouseleave', dragEnd);
+
+    // Click event for team member cards
+    teamMemberCards.forEach((card, index) => {
+        card.addEventListener('click', () => {
+            if (!isDragging) {
+                showMemberDetails(index);
+            }
+        });
+    });
+
+    // Close details button
+    closeDetailsBtn.addEventListener('click', () => {
+        memberDetails.classList.remove('active');
+    });
+
+    // Close details when clicking outside
+    memberDetails.addEventListener('click', (e) => {
+        if (e.target === memberDetails) {
+            memberDetails.classList.remove('active');
+        }
+    });
+
+    // Functions
+    function setActiveCard(index) {
+        teamMemberCards.forEach((card, i) => {
+            card.classList.toggle('active', i === index);
+        });
+    }
+
+    function navigateCarousel(direction) {
+        currentIndex += direction;
+
+        // Loop around if we reach the end or beginning
+        if (currentIndex < 0) {
+            currentIndex = teamMemberCards.length - 1;
+        } else if (currentIndex >= teamMemberCards.length) {
+            currentIndex = 0;
+        }
+
+        updateCarousel();
+    }
+
+    function updateCarousel() {
+        // Calculate the offset to center the active card
+        const offset = -currentIndex * cardWidth + (window.innerWidth / 2) - (cardWidth / 2);
+
+        // Apply the transform with a smooth transition
+        teamCarousel.style.transform = `translateX(${offset}px)`;
+
+        // Set the active card
+        setActiveCard(currentIndex);
+    }
+
+    function startAutoScroll() {
+        autoScrollInterval = setInterval(() => {
+            navigateCarousel(1);
+        }, 5000); // Change every 5 seconds
+    }
+
+    function resetAutoScroll() {
+        clearInterval(autoScrollInterval);
+        startAutoScroll();
+    }
+
+    // Drag functions
+    function dragStart(e) {
+        isDragging = true;
+        startPos = getPositionX(e);
+        animationID = requestAnimationFrame(animation);
+        teamCarousel.style.cursor = 'grabbing';
+        resetAutoScroll();
+    }
+
+    function drag(e) {
+        if (isDragging) {
+            const currentPosition = getPositionX(e);
+            currentTranslate = prevTranslate + currentPosition - startPos;
+        }
+    }
+
+    function dragEnd() {
+        isDragging = false;
+        cancelAnimationFrame(animationID);
+
+        const movedBy = currentTranslate - prevTranslate;
+
+        // If moved enough, navigate to the next or previous card
+        if (movedBy < -100) {
+            navigateCarousel(1);
+        } else if (movedBy > 100) {
+            navigateCarousel(-1);
+        } else {
+            // Otherwise, return to the current card
+            updateCarousel();
+        }
+
+        teamCarousel.style.cursor = 'grab';
+    }
+
+    function getPositionX(e) {
+        return e.type.includes('mouse') ? e.pageX : e.touches[0].clientX;
+    }
+
+    function animation() {
+        setSliderPosition();
+        if (isDragging) requestAnimationFrame(animation);
+    }
+
+    function setSliderPosition() {
+        teamCarousel.style.transform = `translateX(${currentTranslate}px)`;
+    }
+
+    function showMemberDetails(index) {
+        // Get member data
+        const memberCard = teamMemberCards[index];
+        const memberImage = memberCard.querySelector('.member-image').src;
+        const memberName = memberCard.querySelector('.overlay-content h5').textContent;
+        const memberId = memberCard.querySelector('.overlay-content p.text-primary').textContent;
+        const memberPosition = memberCard.querySelector('.overlay-content p.text-white').textContent;
+
+        // Update details modal
+        detailsImage.src = memberImage;
+        detailsName.textContent = memberName;
+        detailsId.textContent = memberId;
+        detailsPosition.textContent = memberPosition;
+
+        // Add description based on the member
+        const descriptions = {
+            0: "Raflian Khansa Dipura adalah seorang ahli dalam bidang Sistem Informasi Kelautan dengan keahlian khusus dalam pengembangan model prediksi berbasis AI untuk analisis data oseanografi. Dengan pengalaman lebih dari 5 tahun dalam penelitian kelautan, ia memimpin tim pengembangan OceanMood.",
+            1: "Sakila Divia Fitriyani adalah seorang analis data dengan latar belakang kuat dalam ilmu kelautan dan pemrograman. Keahliannya dalam visualisasi data dan pengolahan citra satelit berperan penting dalam pengembangan fitur visualisasi OceanMood.",
+            2: "Alia Selvi Solekhah adalah seorang peneliti muda berbakat dengan fokus pada dinamika populasi ikan dan ekosistem laut. Kontribusinya dalam model prediksi migrasi ikan telah membantu meningkatkan akurasi sistem OceanMood secara signifikan.",
+            3: "Dini Dwi Andini adalah seorang Data Scientist dengan keahlian dalam machine learning dan big data analytics. Ia bertanggung jawab atas pengembangan algoritma inti yang menganalisis hubungan antara parameter oseanografi dan populasi ikan."
+        };
+
+        detailsDescription.textContent = descriptions[index] || "Tim ahli di balik pengembangan OceanMood.";
+
+        // Show the details modal
+        memberDetails.classList.add('active');
+    }
+
+    // // Initialize carousel position
+    // updateCarousel();
+
+    // // Handle window resize
+    // window.addEventListener('resize', () => {
+    //     updateCarousel();
+    // });
+});
+</script>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="{{ url_for('static', filename='js/chatbot-api.js') }}"></script>
+<!-- <script src="{{ url_for('static', filename='js/filter-controls.js') }}"></script> -->
+<!-- <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script> -->
+<script>
+    // // Initialize charts and map when DOM is loaded
+    // document.addEventListener('DOMContentLoaded', function() {
+    //     // Control video playback
+    //     const video = document.getElementById('hero-video');
+    //     if (video) {
+    //         // Set video properties for better performance
+    //         video.playbackRate = 0.8; // Slow down playback slightly
+    //         video.muted = true; // Ensure video is muted for autoplay
+
+    //         // Handle video loading
+    //         video.addEventListener('canplay', function() {
+    //             video.play().catch(e => {
+    //                 console.log("Autoplay prevented:", e);
+    //             });
+    //         });
+    //     }
+
+    //     initializeMap();
+
+    //     initializeEventListeners();
+    // });
+
+    // Initialize map function
+    // function initializeMap() {
+    //     // Fungsi initializeMap didefinisikan di file main.js
+    // }
+</script>
+
+
+{% endblock %}

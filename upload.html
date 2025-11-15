@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unggah Data SPL, Klorofil, dan Populasi Ikan - OceanMood</title>
+    <!-- Favicon dengan berbagai ukuran untuk kompatibilitas browser -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/image/Oceanmoodlogoo.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/image/Oceanmoodlogoo.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/image/Oceanmoodlogoo.png">
+    <link rel="shortcut icon" href="/static/image/Oceanmoodlogoo.png">
+    <meta name="msapplication-TileColor" content="#0077be">
+    <meta name="theme-color" content="#0077be">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding-top: 60px;
+        }
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            border: none;
+            overflow: hidden;
+        }
+        .card-header {
+            background: linear-gradient(135deg, #0077be, #00a8cc);
+            color: white;
+            font-weight: bold;
+            border-bottom: none;
+        }
+        .upload-area {
+            border: 2px dashed #0077be;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            margin: 20px 0;
+            background-color: rgba(0, 119, 190, 0.05);
+            transition: all 0.3s ease;
+        }
+        .upload-area:hover {
+            background-color: rgba(0, 119, 190, 0.1);
+            border-color: #00a8cc;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #0077be, #00a8cc);
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #0066aa, #0090bb);
+        }
+        .nav-link {
+            color: rgba(255, 255, 255, 0.75);
+        }
+        .nav-link:hover {
+            color: rgba(255, 255, 255, 1);
+        }
+        .nav-link.active {
+            font-weight: bold;
+            color: rgba(255, 255, 255, 1);
+        }
+        .navbar-blur {
+            background-color: rgba(0, 119, 190, 0.7) !important;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top" id="mainNav">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <img src="/static/image/Oceanmoodlogoo.png" alt="Logo" width="40" height="40" class="d-inline-block align-text-top rounded-circle">
+                OceanMood
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/upload">Unggah Data</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/analyze">Analisis</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="mb-0"><i class="bi bi-cloud-upload"></i> Unggah Data SPL, Klorofil, dan Populasi Ikan</h4>
+                    </div>
+                    <div class="card-body">
+                        {% with messages = get_flashed_messages() %}
+                            {% if messages %}
+                                {% for message in messages %}
+                                    <div class="alert alert-info alert-dismissible fade show" role="alert">
+                                        {{ message }}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
+
+                        <p class="text-muted mb-4">
+                            Unggah file CSV yang berisi data populasi ikan, SPL, dan klorofil untuk dianalisis. 
+                            File harus memiliki kolom "tanggal", "populasi", "spl", dan "klorofil".
+                        </p>
+
+                        <form method="post" enctype="multipart/form-data">
+                            <div class="upload-area" id="dropZone">
+                                <i class="bi bi-file-earmark-arrow-up" style="font-size: 3rem; color: #0077be;"></i>
+                                <h5 class="mt-3">Seret dan Lepas File CSV di Sini</h5>
+                                <p class="text-muted">atau</p>
+                                <input type="file" name="file" id="fileInput" accept=".csv" class="d-none">
+                                <button type="button" class="btn btn-outline-primary" id="browseBtn">
+                                    <i class="bi bi-folder-open"></i> Pilih File
+                                </button>
+                                <div id="fileInfo" class="mt-3"></div>
+                            </div>
+                            <div class="d-grid mt-4">
+                                <button type="submit" class="btn btn-primary" id="uploadBtn" disabled>
+                                    <i class="bi bi-upload"></i> Unggah dan Analisis
+                                </button>
+                            </div>
+                        </form>
+
+                        <div class="mt-4">
+                            <h6>Syarat dan Ketentuan Unggah File:</h6>
+                            <p class="text-muted">
+                                Untuk memastikan data Anda dapat diproses dengan baik, harap perhatikan syarat dan ketentuan berikut:
+                            </p>
+                            <ul class="text-muted">
+                                <li>File harus berformat CSV (Comma Separated Values)</li>
+                                <li>File harus memiliki kolom wajib: "tanggal", "populasi", "spl", dan "klorofil"</li>
+                                <li>Kolom "tanggal" harus menggunakan format YYYY-MM-DD (contoh: 2023-01-01)</li>
+                                <li>Kolom "populasi" harus berisi angka yang menunjukkan jumlah ikan</li>
+                                <li>Kolom "spl" harus berisi nilai numerik untuk Sea Surface Level (permukaan laut)</li>
+                                <li>Kolom "klorofil" harus berisi nilai numerik untuk konsentrasi klorofil</li>
+                                <li>Data harus diurutkan berdasarkan tanggal secara kronologis</li>
+                                <li>File tidak boleh memiliki baris kosong di antara data</li>
+                                <li>Ukuran file maksimal adalah 10MB</li>
+                            </ul>
+                            <div class="table-responsive">
+                                <p class="text-muted mt-3">Berikut adalah contoh format tabel yang sesuai dengan syarat di atas:</p>
+                                <table class="table table-sm table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>tanggal</th>
+                                            <th>populasi</th>
+                                            <th>spl</th>
+                                            <th>klorofil</th>
+                                            <th>...(kolom opsional lainnya)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>2023-01-01</td>
+                                            <td>150</td>
+                                            <td>25.5</td>
+                                            <td>12.3</td>
+                                            <td>...</td>
+                                        </tr>
+                                        <tr>
+                                            <td>2023-01-02</td>
+                                            <td>155</td>
+                                            <td>26.2</td>
+                                            <td>13.1</td>
+                                            <td>...</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Efek blur navbar saat scroll
+            window.addEventListener('scroll', function() {
+                const navbar = document.getElementById('mainNav');
+                if (window.scrollY > 50) {
+                    navbar.classList.add('navbar-blur');
+                } else {
+                    navbar.classList.remove('navbar-blur');
+                }
+            });
+            const dropZone = document.getElementById('dropZone');
+            const fileInput = document.getElementById('fileInput');
+            const browseBtn = document.getElementById('browseBtn');
+            const uploadBtn = document.getElementById('uploadBtn');
+            const fileInfo = document.getElementById('fileInfo');
+
+            // Event listener untuk tombol browse
+            browseBtn.addEventListener('click', function() {
+                fileInput.click();
+            });
+
+            // Event listener untuk input file
+            fileInput.addEventListener('change', function() {
+                if (this.files.length > 0) {
+                    displayFileInfo(this.files[0]);
+                }
+            });
+
+            // Event listener untuk drag and drop
+            dropZone.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.style.backgroundColor = 'rgba(0, 119, 190, 0.1)';
+            });
+
+            dropZone.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                this.style.backgroundColor = 'rgba(0, 119, 190, 0.05)';
+            });
+
+            dropZone.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.style.backgroundColor = 'rgba(0, 119, 190, 0.05)';
+
+                if (e.dataTransfer.files.length > 0) {
+                    const file = e.dataTransfer.files[0];
+                    if (file.name.endsWith('.csv')) {
+                        fileInput.files = e.dataTransfer.files;
+                        displayFileInfo(file);
+                    } else {
+                        fileInfo.innerHTML = '<div class="alert alert-danger">Harap unggah file CSV</div>';
+                        uploadBtn.disabled = true;
+                    }
+                }
+            });
+
+            // Fungsi untuk menampilkan info file
+            function displayFileInfo(file) {
+                fileInfo.innerHTML = `
+                    <div class="alert alert-success">
+                        <strong>File Terpilih:</strong> ${file.name}<br>
+                        <strong>Ukuran:</strong> ${(file.size / 1024).toFixed(2)} KB
+                    </div>
+                `;
+                uploadBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

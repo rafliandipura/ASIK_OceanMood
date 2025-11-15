@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analisis Data SPL, Klorofil, dan Populasi Ikan - OceanMood</title>
+    <!-- Favicon dengan berbagai ukuran untuk kompatibilitas browser -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/image/Oceanmoodlogoo.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/image/Oceanmoodlogoo.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/image/Oceanmoodlogoo.png">
+    <link rel="shortcut icon" href="/static/image/Oceanmoodlogoo.png">
+    <meta name="msapplication-TileColor" content="#0077be">
+    <meta name="theme-color" content="#0077be">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+    <input type="text" id="openai-api-key" placeholder="Masukkan API Key Anda">3247890
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding-top: 60px;
+        }
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            border: none;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        .card-header {
+            background: linear-gradient(135deg, #0077be, #00a8cc);
+            color: white;
+            font-weight: bold;
+            border-bottom: none;
+        }
+        .stat-card {
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            border: none;
+            transition: transform 0.3s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        .trend-up {
+            color: #28a745;
+        }
+        .trend-down {
+            color: #dc3545;
+        }
+        .trend-stable {
+            color: #ffc107;
+        }
+        .nav-link {
+            color: rgba(255, 255, 255, 0.75);
+        }
+        .nav-link:hover {
+            color: rgba(255, 255, 255, 1);
+        }
+        .nav-link.active {
+            font-weight: bold;
+            color: rgba(255, 255, 255, 1);
+        }
+        .navbar-blur {
+            background-color: rgba(0, 119, 190, 0.7) !important;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        .chart-container {
+            position: relative;
+            height: 400px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top" id="mainNav">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <img src="/static/image/Oceanmoodlogoo.png" alt="Logo" width="40" height="40" class="d-inline-block align-text-top rounded-circle">
+                OceanMood
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/upload">Unggah Data</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/analyze">Analisis</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="mb-0"><i class="bi bi-file-earmark-text"></i> Analisis Data SPL, Klorofil, dan Populasi Ikan: {{ filename }}</h4>
+                    </div>
+                    <div class="card-body">
+                        {% with messages = get_flashed_messages() %}
+                            {% if messages %}
+                                {% for message in messages %}
+                                    <div class="alert alert-info alert-dismissible fade show" role="alert">
+                                        {{ message }}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
+
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <div class="stat-card card bg-primary text-white">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Rata-rata SPL</h5>
+                                        <h3 class="card-text">{{ "%.2f"|format(analysis_result.spl_stats.mean) }}°C</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="stat-card card bg-success text-white">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Rata-rata Klorofil</h5>
+                                        <h3 class="card-text">{{ "%.2f"|format(analysis_result.klorofil_stats.mean) }} mg/m³</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="stat-card card bg-info text-white">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Rata-rata Populasi Ikan</h5>
+                                        <h3 class="card-text">{{ "%.2f"|format(analysis_result.stats.mean) }}</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="stat-card card bg-warning text-dark">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Tren Populasi</h5>
+                                        <h3 class="card-text">
+                                            {% if analysis_result.trend == "Meningkat" %}
+                                                <i class="bi bi-arrow-up-circle trend-up"></i>
+                                            {% elif analysis_result.trend == "Menurun" %}
+                                                <i class="bi bi-arrow-down-circle trend-down"></i>
+                                            {% else %}
+                                                <i class="bi bi-dash-circle trend-stable"></i>
+                                            {% endif %}
+                                            {{ analysis_result.trend }}
+                                        </h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-graph-up"></i> Tren SPL dan Klorofil-a</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="splChlorophyllChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-graph-up-arrow"></i> Dinamika Populasi (Perubahan Harian)</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="populationDynamicsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-bar-chart"></i> Statistik Populasi</h5>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-striped">
+                            <tr>
+                                <td>Nilai Minimum</td>
+                                <td>{{ "%.2f"|format(analysis_result.stats.min) }}</td>
+                            </tr>
+                            <tr>
+                                <td>Nilai Maksimum</td>
+                                <td>{{ "%.2f"|format(analysis_result.stats.max) }}</td>
+                            </tr>
+                            <tr>
+                                <td>Median</td>
+                                <td>{{ "%.2f"|format(analysis_result.stats.median) }}</td>
+                            </tr>
+                            <tr>
+                                <td>Standar Deviasi</td>
+                                <td>{{ "%.2f"|format(analysis_result.stats.std) }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-arrow-left-right"></i> Fluktuasi Populasi</h5>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-striped">
+                            <tr>
+                                <td>Kenaikan Harian Maksimum</td>
+                                <td>{{ "%.2f"|format(analysis_result.fluctuation.max_increase) }}</td>
+                            </tr>
+                            <tr>
+                                <td>Penurunan Harian Maksimum</td>
+                                <td>{{ "%.2f"|format(analysis_result.fluctuation.max_decrease) }}</td>
+                            </tr>
+                            <tr>
+                                <td>Perubahan Persentase Rata-rata</td>
+                                <td>{{ "%.2f"|format(analysis_result.avg_pct_change) }}%</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4 mb-4">
+            <div class="col-md-12">
+                <div class="chatbot-container">
+                    <div class="chatbot-header">
+                        <h5><i class="fas fa-robot"></i> OceanMood AssistantAI <span class="chatbot-ai-badge">AI</span></h5>
+                        <div class="chatbot-status">
+                            <div class="status-indicator"></div>
+                            <span>Online</span>
+                        </div>
+                    </div>
+                    <div class="chatbot-body" id="chatbot-body-analyze">
+                        <div class="chat-message bot-message">
+                            <div class="message-bubble">
+                                <p>Halo! Saya OceanMood AssistantAI, asisten cerdas untuk analisis data kelautan. Berdasarkan data yang Anda unggah, saya dapat membantu Anda dengan:</p>
+                                <ul>
+                                    <li>Grafik SPL dan Klorofil-a</li>
+                                    <li>Identifikasi faktor-faktor yang mempengaruhi populasi</li>
+                                    <li>Rekomendasi strategis untuk pengelolaan perikanan</li>
+                                    <li>Simulasi skenario berdasarkan perubahan parameter</li>
+                                </ul>
+                                <p>Apa yang ingin Anda ketahui tentang data Anda?</p>
+                                <div class="message-time">Hari ini, <span id="current-time-analyze"></span></div>
+                            </div>
+                        </div>
+                        <div class="chatbot-thinking" id="chatbot-thinking-analyze">
+                            <i class="fas fa-spinner"></i>
+                            OceanMood AssistantAI sedang menganalisis data...
+                        </div>
+                    </div>
+                    <div class="chatbot-footer">
+                        <div class="chatbot-input-group">
+                            <input type="text" class="chatbot-input" id="chatbot-input-analyze" placeholder="Ketik pertanyaan Anda...">
+                            <button class="chatbot-send-btn" id="chatbot-send-analyze">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                        <div class="chatbot-suggestions">
+                            <div class="suggestion-chip" data-query="Apa faktor utama yang mempengaruhi penurunan populasi ikan?">Faktor Penurunan</div>
+                            <div class="suggestion-chip" data-query="Bagaimana cara meningkatkan populasi ikan?">Strategi Peningkatan</div>
+                            <div class="suggestion-chip" data-query="Buat simulasi jika SPL naik 2 derajat">Simulasi SPL</div>
+                            <div class="suggestion-chip" data-query="Beri rekomendasi berdasarkan analisis data">Rekomendasi</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4 mb-4">
+            <div class="col-md-12 text-center">
+                <a href="/upload" class="btn btn-outline-primary">
+                    <i class="bi bi-arrow-left"></i> Unggah Data Baru
+                </a>
+                <a href="/" class="btn btn-primary ms-2">
+                    <i class="bi bi-house"></i> Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/chatbot-api.js') }}"></script>
+    <script>
+        // Efek blur navbar saat scroll
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('mainNav');
+            if (window.scrollY > 50) {
+                navbar.classList.add('navbar-blur');
+            } else {
+                navbar.classList.remove('navbar-blur');
+            }
+        });
+        
+
+
+        // Fetch data populasi aktual dari server
+        fetch('/api/ocean_data')
+            .then(response => response.json())
+            .then(data => {
+                // Grafik Tren SPL dan Klorofil-a
+                const splChlorophyllCtx = document.getElementById('splChlorophyllChart').getContext('2d');
+                new Chart(splChlorophyllCtx, {
+                    type: 'line',
+                    data: {
+                        labels: data.dates,
+                        datasets: [
+                            {
+                                label: 'SPL (Sea Surface Level)',
+                                data: data.spl,
+                                borderColor: '#0077be',
+                                backgroundColor: 'rgba(0, 119, 190, 0.1)',
+                                tension: 0.4,
+                                fill: false,
+                                yAxisID: 'y'
+                            },
+                            {
+                                label: 'Klorofil-a',
+                                data: data.klorofil_a,
+                                borderColor: '#28a745',
+                                backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                                tension: 0.4,
+                                fill: false,
+                                yAxisID: 'y1'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: {
+                            mode: 'index',
+                            intersect: false,
+                        },
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Tren SPL dan Klorofil-a'
+                            }
+                        },
+                        scales: {
+                            y: {
+                                type: 'linear',
+                                display: true,
+                                position: 'left',
+                                title: {
+                                    display: true,
+                                    text: 'SPL (m)'
+                                }
+                            },
+                            y1: {
+                                type: 'linear',
+                                display: true,
+                                position: 'right',
+                                title: {
+                                    display: true,
+                                    text: 'Klorofil-a (mg/m³)'
+                                },
+                                grid: {
+                                    drawOnChartArea: false,
+                                },
+                            },
+                        }
+                    }
+                });
+
+                // Grafik Dinamika Populasi
+                const dynamicsCtx = document.getElementById('populationDynamicsChart').getContext('2d');
+                const populationChanges = [];
+                for (let i = 1; i < data.populasi.length; i++) {
+                    populationChanges.push(data.populasi[i] - data.populasi[i-1]);
+                }
+
+                new Chart(dynamicsCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.dates.slice(1),
+                        datasets: [{
+                            label: 'Perubahan Populasi Harian',
+                            data: populationChanges,
+                            backgroundColor: populationChanges.map(value => value > 0 ? 'rgba(40, 167, 69, 0.7)' : 'rgba(220, 53, 69, 0.7)'),
+                            borderColor: populationChanges.map(value => value > 0 ? '#28a745' : '#dc3545'),
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Dinamika Populasi (Perubahan Harian)'
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            });
+
+
+    </script>
+</body>
+</html>

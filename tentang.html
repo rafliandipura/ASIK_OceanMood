@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tentang OceanMood</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f6f9fc;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 80px auto;
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            padding: 60px;
+            text-align: center;
+        }
+        h1 {
+            color: #007bff;
+            font-weight: 700;
+        }
+        p {
+            color: #333;
+            line-height: 1.7;
+            font-size: 16px;
+        }
+        .features {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin-top: 50px;
+        }
+        .feature-card {
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            width: 230px;
+            padding: 25px;
+            margin: 10px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+        .feature-icon {
+            background: #e9f3ff;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+        }
+        .feature-icon img {
+            width: 30px;
+            height: 30px;
+        }
+        h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .feature-desc {
+            font-size: 14px;
+            color: #666;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 40px;
+            color: #007bff;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Tentang OceanMood</h1>
+        <p>
+            <b>OceanMood</b> adalah sistem inovatif berbasis AI dan Business Intelligence yang dirancang
+            untuk menganalisis "suasana laut" berdasarkan data oseanografi — seperti
+            <b>Suhu Permukaan Laut (SPL)</b> dan <b>Klorofil-a</b> — guna memahami pola perubahan populasi ikan
+            di suatu wilayah perairan.
+        </p>
+        <p>
+            Dengan membaca "mood laut", sistem ini membantu mengidentifikasi hubungan antara kondisi lingkungan laut
+            dan dinamika populasi biota ikan secara spasial dan temporal.
+        </p>
+
+        <h2 style="margin-top:40px;">Fitur Utama OceanMood:</h2>
+
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <img src="https://img.icons8.com/ios-filled/50/007bff/water.png" alt="Data">
+                </div>
+                <h3>Analisis Data Real-time</h3>
+                <p class="feature-desc">Pemantauan data oseanografi langsung untuk mendapatkan insight terkini</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <img src="https://img.icons8.com/ios-filled/50/28a745/fish.png" alt="Prediksi">
+                </div>
+                <h3>Prediksi Migrasi Ikan</h3>
+                <p class="feature-desc">Model prediksi untuk mengidentifikasi pola pergerakan populasi ikan</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <img src="https://img.icons8.com/ios-filled/50/00bcd4/combo-chart.png" alt="Visualisasi">
+                </div>
+                <h3>Visualisasi Mood Laut</h3>
+                <p class="feature-desc">Tampilan interaktif untuk memahami kondisi dan suasana laut</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <img src="https://img.icons8.com/ios-filled/50/ffc107/marker.png" alt="Lokasi">
+                </div>
+                <h3>Lokasi Penangkapan</h3>
+                <p class="feature-desc">Rekomendasi area optimal untuk aktivitas penangkapan ikan</p>
+            </div>
+        </div>
+
+        <a href="{{ url_for('index') }}" class="back-link">← Kembali ke Dashboard</a>
+    </div>
+</body>
+</html>
